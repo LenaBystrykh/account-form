@@ -10,7 +10,7 @@
     <p>Для указания нескольких меток для одной пары логин/пароль используйте разделитель ;</p>
   </div>
   <div v-for="account in accounts" :key="account.id" class="mb-3">
-    <FormField :account="account" @delete-row="deleteRow(account.id)" />
+    <FormField :account="account" @delete-row="deleteRow(account.id)" @update-row="updateRow(account)" />
   </div>
 </template>
 
@@ -24,6 +24,18 @@ const store = useAccountStore();
 
 const accounts = ref(store.accounts);
 
+interface Label {
+    text: string
+}
+
+interface AccountInfo {
+    id: number,
+    label: Label[],
+    accountType: string,
+    login: string,
+    password: string | null
+}
+
 function deleteRow(id: number) {
   store.deleteAccount(id);
   accounts.value = store.accounts;
@@ -31,6 +43,10 @@ function deleteRow(id: number) {
 
 function addAccount() {
   store.addAccount();
+}
+
+function updateRow(account: AccountInfo) {
+  store.updateAccount(account);
 }
 </script>
 

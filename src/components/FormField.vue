@@ -1,15 +1,15 @@
 <template>
    <div class="form-row">
     <input type="text" class="form-row__field" @blur="updateLabel" :value="label">
-    <select class="form-row__select" v-model="accountInfo.accountType">
+    <select class="form-row__select" v-model="accountInfo.accountType" @change="validate">
         <option v-for="option in options" :value="option.value">
             {{ option.text }}
         </option>
     </select>
-    <input required type="text" class="form-row__field" :class="{ 'wide': !needPassword }" v-model="accountInfo.login">
+    <input required type="text" class="form-row__field" :class="{ 'wide': !needPassword, error: loginError }" v-model="accountInfo.login" @blur="validate">
     <div v-if="needPassword" class="password-container">
-        <input required :type="isVisible ? 'text' : 'password'" class="form-row__field" v-model="accountInfo.password">
-        <EyeIcon @click="switchVisibility" />
+        <input required :type="isVisible ? 'text' : 'password'" class="form-row__field" :class="{error: passwordError}" v-model="accountInfo.password" @blur="validate">
+        <EyeIcon @click="switchVisibility" :visible="isVisible" />
     </div>
     <DeleteIcon @click="deleteRow" />
    </div> 
@@ -36,12 +36,13 @@ const props = defineProps({
     account: { type: Object as PropType<AccountInfo>, required: true }
 })
 
+const emit = defineEmits(['deleteRow', 'updateRow']);
+
 const accountInfo = props.account;
-
-const emit = defineEmits(['deleteRow']);
-
 const isVisible = ref(false);
 const label = ref(getLabel(accountInfo.label));
+const loginError = ref(false);
+const passwordError = ref(false);
 
 const options = [
   { text: 'Локальная', value: 'local' },
@@ -70,8 +71,18 @@ function getLabel(arr: Label[]) {
     return label;
 }
 
-function updateLabel() {
-    console.log('focus off')
+function updateLabel(event) {
+    label.value = event.target.value;
+    accountInfo.label = label.value.split(';').map(item => ({ text: item.trim() }));
+    validate()
+}
+
+function validate() {
+    loginError.value = accountInfo.login.length === 0 ? true : false;
+    passwordError.value = accountInfo.accountType === 'local' ? accountInfo.password === null || accountInfo.password.length === 0 ? true : false : false;
+    if (!loginError.value && !passwordError.value) {
+        emit('updateRow', accountInfo)
+    }
 }
 </script>
 
@@ -104,10 +115,19 @@ function updateLabel() {
 .password-container {
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 .password-container svg {
-    margin-left: -24px;
+    position: absolute;
+    right: 4px;
+}
+
+.error {
+    border: 1px solid red;
+}
+
+svg {
     cursor: pointer;
 }
 </style>
