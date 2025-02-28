@@ -9,6 +9,12 @@
     <HelpIcon />
     <p>Для указания нескольких меток для одной пары логин/пароль используйте разделитель ;</p>
   </div>
+  <div class="form-header">
+    <p>Метки</p>
+    <p class="small">Тип записи</p>
+    <p>Логин</p>
+    <p>Пароль</p>
+  </div>
   <div v-for="account in accounts" :key="account.id" class="mb-3">
     <FormField :account="account" @delete-row="deleteRow(account.id)" @update-row="updateRow(account)" />
   </div>
@@ -42,7 +48,13 @@ function deleteRow(id: number) {
 }
 
 function addAccount() {
-  store.addAccount();
+  accounts.value.push({
+    id: accounts.value[accounts.value.length - 1]?.id + 1 || 1,
+    label: [{text: ''}],
+    accountType: 'local',
+    login: '',
+    password: null
+  })
 }
 
 function updateRow(account: AccountInfo) {
@@ -92,6 +104,23 @@ function updateRow(account: AccountInfo) {
   padding: 4px 8px;
   gap: 8px;
   margin: 20px 0;
+}
+
+.form-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-header p {
+  width: 150px;
+  text-align: left;
+  font-size: 12px;
+  color: #9b9b9b;
+}
+
+.form-header p.small {
+  width: 100px;
 }
 
 .mb-3 {

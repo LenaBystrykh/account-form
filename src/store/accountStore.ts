@@ -12,19 +12,13 @@ export const useAccountStore = defineStore('account', {
         }
     },
     actions: {
-        addAccount() {
-            this.accounts.push({
-                id: this.accounts[this.accounts.length - 1]?.id + 1 || 1,
-                label: [{text: ''}],
-                accountType: 'local',
-                login: '',
-                password: null
-            })
-            localStorage.setItem('accounts', JSON.stringify(this.accounts));
-        },
         updateAccount(account: AccountInfo) {
             const index = this.accounts.findIndex((item) => item.id === account.id);
-            this.accounts[index] = account;
+            if (index === -1) {
+                this.accounts.push(account)
+            } else {
+                this.accounts[index] = account;
+            }
             localStorage.setItem('accounts', JSON.stringify(this.accounts));
         },
         deleteAccount(id: Number) {

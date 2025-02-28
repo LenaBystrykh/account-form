@@ -1,14 +1,14 @@
 <template>
    <div class="form-row">
-    <input type="text" class="form-row__field" @blur="updateLabel" :value="label">
+    <input maxlength="50" type="text" class="form-row__field" @blur="updateLabel" :value="label">
     <select class="form-row__select" v-model="accountInfo.accountType" @change="validate">
         <option v-for="option in options" :value="option.value">
             {{ option.text }}
         </option>
     </select>
-    <input required type="text" class="form-row__field" :class="{ 'wide': !needPassword, error: loginError }" v-model="accountInfo.login" @blur="validate">
+    <input required maxlength="100" type="text" class="form-row__field" :class="{ 'wide': !needPassword, error: loginError }" v-model="accountInfo.login" @blur="validate">
     <div v-if="needPassword" class="password-container">
-        <input required :type="isVisible ? 'text' : 'password'" class="form-row__field" :class="{error: passwordError}" v-model="accountInfo.password" @blur="validate">
+        <input required maxlength="100" :type="isVisible ? 'text' : 'password'" class="form-row__field" :class="{error: passwordError}" v-model="accountInfo.password" @blur="validate">
         <EyeIcon @click="switchVisibility" :visible="isVisible" />
     </div>
     <DeleteIcon @click="deleteRow" />
@@ -79,7 +79,7 @@ function updateLabel(event) {
 
 function validate() {
     loginError.value = accountInfo.login.length === 0 ? true : false;
-    passwordError.value = accountInfo.accountType === 'local' ? accountInfo.password === null || accountInfo.password.length === 0 ? true : false : false;
+    passwordError.value = accountInfo.accountType === 'local' && (accountInfo.password === null || accountInfo.password.length === 0) ? true : false;
     if (!loginError.value && !passwordError.value) {
         emit('updateRow', accountInfo)
     }
